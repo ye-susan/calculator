@@ -15,19 +15,43 @@ export const InputBox = () => {
   }
 
   const parseAndCalculate = () => {
-    
-
     let total = 0;
-    let constantList = inputValue.split(/[/+*-]+/);
-    let operatorList = inputValue.split(/[\d\s]+/).filter((value) => {
-      return value !== "";
-    } );
+    // let constantList = inputValue.split(/[/+*-]+/);
+    // let operatorList = inputValue.split(/[\d\s]+/).filter((value) => {
+    //   return value !== "";
+    // } );
+    
+    //  To follow the order of operations (PEMDAS):
+    //split on () --> evaluate and replace with answer
+    //split on +/-  --> evaluate and replace with answer
+    //evaluate entire expression and return answer
 
-    console.log(constantList)
-    console.log(operatorList)
+    //Calculate / and *
+    let list = inputValue.split(/[+-]+/);
+    // console.log(list)    
+
+    console.log('answer: '+applyOperation(list[0]))
     return total;
   }
 
+  const applyOperation = (expression) => {
+    let operator = expression.split(/[\d\s]+/).filter( value => { return value !== ""});
+    let constants = expression.split(/[/+*-]+/);
+
+    //can't use switch b/c it uses the strict comparison
+    if(operator == "/") {
+      return constants[0] / constants[1];
+    } else if (operator == "*") {
+      return constants[0] * constants[1]; 
+    } else if (operator == "+") {
+      return constants[0] + constants[1]; 
+    } else if (operator == "-") {
+      return constants[0] - constants[1]; 
+    } else {
+      return "Syntax Error"
+    }
+ 
+  }
 
   /************** EVENT HANDLERS ******************/
   const handleChange = event => {
