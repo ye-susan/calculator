@@ -21,5 +21,10 @@ Calculator
 - [ ] validate input - accept only arithmetic operators and numbers
 - [ ] splitting expressions into chunks
 - [ ] calculating expressions based on PEMDAs order
-
 - [ ] build history box
+
+### Future To Do / Improving the Application 
+- 
+
+### Minor Considerations
+ - How many decimal places to return the answer in?  
