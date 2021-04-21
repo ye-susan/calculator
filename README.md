@@ -1,5 +1,7 @@
 # Calculator (VidMob)
 
+## Description of the application:
+A simple React application to calculate arithmetic expressions without the use of JavaScript's eval() function. 
 ## Running the application:
 `npm install` to download packages and `npm start` to run
 
@@ -10,9 +12,9 @@ Calculator
 │ README.md
 └─App 
   └── InputBox
-      Accepts inputs, validates them, and calculates answers
+      (Accepts inputs, validates them, and calculates answers)
   └── DisplayHistory
-      Records past validated expressions with the answers, can refill input box with historical expressions
+      (Records past validated expressions with the answers, can refill input box with historical expressions)
 ```
 
 ### To Do
