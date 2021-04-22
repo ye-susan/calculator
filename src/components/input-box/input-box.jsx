@@ -17,63 +17,68 @@ export const InputBox = () => {
   /************** PARSING AND CALCULATING ******************/
   const parseAndCalculate = () => {
    
-    //To follow the order of operations (PEMDAS):
+    //To follow the order of operations:
     //  Step 1: split on () --> evaluate and replace with answer
     //  Step 2: split on +/-  --> evaluate and replace with answer
-    //  Step 3: evaluate entire expression and return answer
+    //  Step 3: evaluate entire expression (which should only contain +/- left) and return answer
 
     let value = inputValue.slice();
     //const multDivExp = /[+-]?\d*\.?\d+\s*([*/])\s*([+-]?\d*\.?\d+)/;
     const multDivExp = /[-]?\d*\.?\d+\s*([*/])\s*([-]?\d*\.?\d+)/;
     const addSubtExp = /([+-]?\d*\.?\d+)\s*([+-])\s*([+-]?\d*\.?\d+)/;
 
-    //while value is not standalone number - keep evaluating
-    // while (value.search(/^\s*([+-]?\d*\.?\d+)\s*$/) === -1) {
-      
-      //Step 1, evaluate items between parentheses (if they exist)
-      if (value.includes("(")) {
-        let itemsInParen = value.split(/\(([^\)]+)\)/).filter( i => {
-          return i !== "";
-        }); //splitting based on items between parentheses
 
-        console.log(`itemsInParen after split: ${itemsInParen}`); 
-        let parenAnswer = 0;
-        for (let item of itemsInParen) {
-          console.log(`item in parens: ${item}`)
-          item = item.replace(/[()]/,"");
-          parenAnswer = applyOperations(item);
-        }
-        
-        value = value.replace(/\(([^\)]+)\)/,parenAnswer)
-        //console.log(`itemsInParen: ${itemsInParen}`); 
+    //Step 1, evaluate items between parentheses (if they exist)
+    while (value.includes("(") && value.includes(")")) {
+      //splitting based on items between parentheses
+      value = value.replace(/\(([^\)]+)\)/, exp => {
+        exp = exp.replace("(","")
+        exp = exp.replace(")","")
+        return applyOperations(exp)
+      })
+      if(errorCheck(value)){
+        break;
       }
+    }
 
-      //Step 2, evaluate expressions with * and / first (if they exist)
-      while (value.includes("/") || value.includes("*")){
-        //replace the * and / expressions with the evaluated answers
-        value = value.replace( multDivExp, function(exp) {
-          return applyOperations(exp);
-        })
-        console.log(`value after calculating */ : ${value}`)
+    //Step 2, evaluate expressions with * and / first (if they exist)
+    while (value.includes("/") || value.includes("*")){
+      //replace the * and / expressions with the evaluated answers
+      value = value.replace( multDivExp, function(exp) {
+        return applyOperations(exp);
+      })
+      if(errorCheck(value)){
+        break;
       }
+      console.log(`value after calculating */ : ${value}`)
+    }
 
-      while (value.includes("+") || value.includes("-")){
-        //replace the * and / expressions with the evaluated answers
-        value = value.replace( addSubtExp, function(exp) {
-          return applyOperations(exp);
-        })
-        console.log(`value after calculating +- : ${value}`)
+    while (value.includes("+") || value.includes("-")){
+      //replace the * and / expressions with the evaluated answers
+      value = value.replace( addSubtExp, function(exp) {
+        return applyOperations(exp);
+      })
+      if(errorCheck(value)){
+        break;
       }
+      console.log(`value after calculating +- : ${value}`)
+    }
     
-      if(value.includes("NaN") || value.includes("Syntax Error")) {
-        return setAnswerValue(`Syntax Error`);
-      } else {
-        value = applyOperations(value).toString();
-      }
-      //console.log(`value type: ${typeof(value)}`)
+    if (errorCheck(value) === false) { 
+      value = applyOperations(value).toString();
+    }
     //} //for while loop
 
-    return setAnswerValue(`Answer: ${value}`);
+    return errorCheck(value) ? setAnswerValue("Syntax Error") : setAnswerValue(`Answer: ${value}`);
+  }
+
+  const errorCheck = (value) => {
+    if(value.includes("NaN") || value.includes("Syntax Error") || value.includes("undefined")) {
+      console.log("error break")
+      return true
+    } else {
+      return false;
+    }    
   }
 
   const applyOperations = (expression) => {
@@ -86,6 +91,7 @@ export const InputBox = () => {
     // }
 
     //checking for double operators
+    //a is entire expression, b & c are the 1st and 2nd operator, and d is the constant/number
     expression = expression.replace(/([+-])([+-])(\d|\.)/g, function (a, b, c, d) { 
       return (b === c ? '+' : '-') + d; 
     });
@@ -94,7 +100,6 @@ export const InputBox = () => {
       return op !== "" && op !== "." && op !== "(" && op !== ")" 
     });
 
-    //constants can have +/- in front 
     let constants = expression.split(/[/+*-]+/); 
 
     console.log("expression: " + expression);
