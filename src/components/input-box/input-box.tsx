@@ -43,7 +43,7 @@ export const InputBox: React.FC = () => {
       }
     }
 
-    //While expression is not a standalone number/value, 
+    //Step3, while expression is not a standalone number/value, 
     while (value.search(/^\s*([+-]?\d*\.?\d+)\s*$/) === -1) {
       value = solveAndCheck(value, addSubtExp);
       if (value === "Syntax Error") { 
@@ -91,7 +91,7 @@ export const InputBox: React.FC = () => {
     // returns array: ["a+b", "a", "+", "b"]
     let expItems: RegExpExecArray = expressionRegex.exec(expression);
         
-    switch(expItems[2]) {
+    switch(expItems[2]) { //check value of operator (or is not an operator)
       case "/": 
         return (parseFloat(expItems[1]) / parseFloat(expItems[3])).toString();
       case "*": 
@@ -120,18 +120,21 @@ export const InputBox: React.FC = () => {
 
  /************** COMPONENT OUTPUT ******************/ 
   return ( 
-    <div className="input-box">
-      <form onSubmit={handleSubmit}>
-        <input 
-          value={inputValue} 
-          onChange={event => setInputValue(event.target.value)} 
-          type="text"
-          data-testid="input-element"
-        />
-        <button data-testid="submit-button">Submit</button>
-      </form >
+    <div className="input-box-container">
+      <div className="input-box">
+        <p className="input-text">Enter a mathematical expression:</p>
+        <form onSubmit={handleSubmit}>
+          <input 
+            value={inputValue} 
+            onChange={event => setInputValue(event.target.value)} 
+            type="text"
+            data-testid="input-element"
+          />
+          <button data-testid="submit-button">Submit</button>
+        </form >
 
-      <div className="answer" data-testid="answer-element">{answerValue} </div>
+        <div className="answer" data-testid="answer-element">{answerValue} </div>
+      </div>
     </div>
   )
 }

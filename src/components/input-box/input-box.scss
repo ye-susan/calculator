@@ -1,5 +1,18 @@
+.input-box-container {
+  margin-top: 25vh; 
+}
+
 .input-box {
-  margin: 50px;  
+  background: rgb(228, 228, 255);
+  border-radius: 10px;
+  border: 1px solid rgb(126, 126, 126);
+  margin: 50px auto;
+  padding: 35px 50px;
+  width: 500px;
+}
+
+.input-text {
+  padding: 0;
 }
 
 input {
@@ -13,4 +26,8 @@ button {
   font-size: large;
   margin-left: 10px;
   border-radius: 5px;
+}
+
+.answer {
+  margin-top: 15px;
 }
