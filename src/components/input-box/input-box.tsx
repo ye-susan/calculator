@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, FormEvent } from 'react';
 import './input-box.scss';
 
-export const InputBox = () => {
-
-  const [inputValue, setInputValue] = useState("");
-  const [answerValue, setAnswerValue] = useState("Answer: ");
+export const InputBox: React.FC = () => {
+  const [inputValue, setInputValue] = useState<string>("");
+  const [answerValue, setAnswerValue] = useState<string>("Answer: ");
   
   /************** INPUT VALIDATION ******************/
-  const inputValidationCheck = input => {  
+  const inputValidationCheck = (input: string) => {  
     // Output error message if input includes any alphabetical characters
     const regex = /[a-zA-Z]/;
     return regex.test(input);
@@ -15,19 +14,20 @@ export const InputBox = () => {
 
 
   /************** PARSING AND CALCULATING ******************/
-  const parseAndCalculate = () => {
+  const parseAndCalculate = (inputValue: string) => {
 
     //To follow the order of operations:
-    //  Step 1: split on () --> evaluate and replace with answer
-    //  Step 2: split on +/-  --> evaluate and replace with answer
-    //  Step 3: evaluate entire expression (which should only contain +/-)
+    //  Step 1: evaluate expression within () and replace with answer
+    //  Step 2: evaluate expressions with * and / and replace with answer
+    //  Step 3: evaluate entire expression (which should only contain +/- now)
     
     let value = inputValue.slice();
     const multDivExp = /[-]?\d*\.?\d+\s*([*/])\s*([-]?\d*\.?\d+)/;
     const addSubtExp = /([+-]?\d*\.?\d+)\s*([+-])\s*([+-]?\d*\.?\d+)/;
-    const parenExp = /\(([^\)]+)\)/;
+    const parenExp = /\(([^)]+)\)/;
 
     //Step 1, evaluate items between parentheses (if they exist)
+    //NOTE: This function does not test for nested parentheses
     while (value.includes("(") && value.includes(")")) {
       value = solveAndCheck(value, parenExp);
       if (value === "Syntax Error") { 
@@ -54,9 +54,9 @@ export const InputBox = () => {
     return setAnswerValue(`Answer: ${value}`);
   }
 
-  const solveAndCheck = (value, regex) => {
+  const solveAndCheck = (value: string, regex: RegExp) => {
     //replace the operators +-/* with the evaluated answer
-    let newValue = value.replace( regex, exp => {
+    let newValue = value.replace( regex, (exp: string) => {
       exp = exp.replace("(","")
       exp = exp.replace(")","")
       return applyOperations(exp);
@@ -67,11 +67,10 @@ export const InputBox = () => {
     } else {
       value = newValue;
     }
-
     return value;
   }
 
-  const errorCheck = (value) => {
+  const errorCheck = (value: string) => {
     if(value.includes("NaN") || value.includes("Syntax Error") || value.includes("undefined")) {
       console.log("error break")
       return true
@@ -80,9 +79,8 @@ export const InputBox = () => {
     }    
   }
 
-  const applyOperations = (expression) => {
-
-    //checking for double operators
+  const applyOperations = (expression: string) => {
+    //Checking for double operators
     //Parameters: "exp" is the entire expression, "op1" & "op2" are the 1st and 2nd operator, and "num" is the constant/number
     expression = expression.replace(/([+-])([+-])(\d|\.)/g, (exp, op1, op2, num) => { 
       return (op1 === op2 ? '+' : '-') + num; 
@@ -92,17 +90,17 @@ export const InputBox = () => {
     let expressionRegex = /([+-]?\d*\.?\d+)\s*([*/+-])\s*([+-]?\d*\.?\d+)/;
     // breaks up expression into 4 parts: for example, if expression was "a+b"
     // returns array: ["a+b", "a", "+", "b"]
-    let expItems = expressionRegex.exec(expression);
+    let expItems: RegExpExecArray = expressionRegex.exec(expression);
         
     switch(expItems[2]) {
       case "/": 
-        return parseFloat(expItems[1]) / parseFloat(expItems[3]);
+        return (parseFloat(expItems[1]) / parseFloat(expItems[3])).toString();
       case "*": 
-        return parseFloat(expItems[1]) * parseFloat(expItems[3]);
+        return (parseFloat(expItems[1]) * parseFloat(expItems[3])).toString();
       case "-": 
-        return parseFloat(expItems[1]) - parseFloat(expItems[3]);
+        return (parseFloat(expItems[1]) - parseFloat(expItems[3])).toString();
       case "+": 
-        return parseFloat(expItems[1]) + parseFloat(expItems[3]); 
+        return (parseFloat(expItems[1]) + parseFloat(expItems[3])).toString(); 
       default:
         return "Syntax Error";
     }
@@ -111,11 +109,7 @@ export const InputBox = () => {
 
 
   /************** EVENT HANDLERS ******************/
-  const handleChange = event => {
-    setInputValue(event.target.value); 
-  }
-
-  const handleSubmit = event => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>)=> {
     event.preventDefault();
     if (inputValidationCheck(inputValue)) {
       setAnswerValue(`Invalid Input`);
@@ -124,21 +118,21 @@ export const InputBox = () => {
     }
   }
 
-  const handleKeyPress = event => {
-    if (event.key === 'Enter') {
-      handleSubmit(event);
-    }
-  }
 
-  //if validation suceessful, then pass to history box -- use Context?
-  //if input invalid, unhide text that warns of invalid input - and highlight box red
+ /************** COMPONENT OUTPUT ******************/ 
   return ( 
     <div className="input-box">
-      <input value={inputValue} onChange={handleChange} onKeyPress={handleKeyPress} type="text"></input>
-      <button type="submit" onClick={handleSubmit}>Submit</button>
+      <form onSubmit={handleSubmit}>
+        <input 
+          value={inputValue} 
+          onChange={event => setInputValue(event.target.value)} 
+          type="text">
+        </input>
+
+        <button>Submit</button>
+      </form >
+
       <div className="answer">{answerValue} </div>
     </div>
   )
 }
-
-export default InputBox;
