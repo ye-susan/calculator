@@ -71,8 +71,7 @@ export const InputBox: React.FC = () => {
   }
 
   const errorCheck = (value: string) => {
-    if(value.includes("NaN") || value.includes("Syntax Error") || value.includes("undefined")) {
-      console.log("error break")
+    if(value.includes("NaN") || value.includes("Syntax Error")) {
       return true
     } else {
       return false;
@@ -126,13 +125,13 @@ export const InputBox: React.FC = () => {
         <input 
           value={inputValue} 
           onChange={event => setInputValue(event.target.value)} 
-          type="text">
-        </input>
-
-        <button>Submit</button>
+          type="text"
+          data-testid="input-element"
+        />
+        <button data-testid="submit-button">Submit</button>
       </form >
 
-      <div className="answer">{answerValue} </div>
+      <div className="answer" data-testid="answer-element">{answerValue} </div>
     </div>
   )
 }
